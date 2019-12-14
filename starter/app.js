@@ -124,7 +124,7 @@ var Controller = (function(budgetCtrl,UICtrl) {
 
     return {
         init: function() {
-            console.log("App has started");
+            console.log("App has started!");
             setupEventListeners();
         }
     }
