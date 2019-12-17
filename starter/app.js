@@ -10,7 +10,20 @@ var budgetController = (function() {
             this.id = id;
             this.description = description;
             this.value = value;
+            this.percentage = -1;
     };
+    // added calculatePercentages method for Expense object
+    Expense.prototype.calculatePercentages = function(totalIncome) {
+        if(totalIncome>0) {
+          this.percentage = Math.round((this.value / totalIncome )*100);
+        } else {
+            this.percentage = -1;
+        }
+    }
+
+    Expense.prototype.getPercentage = function() {
+        return this.percentage;
+    }
 
     var Income = function(id, description, value) {
         this.id = id;
@@ -72,10 +85,21 @@ var budgetController = (function() {
                 return current.id;
             });
             index = ids.indexOf(id);
-            console.log(index);
             if(index !== -1) {
               data.allItems[type].splice(index, 1);
             }
+        },
+        calculatePercentages: function() {
+          data.allItems.exp.forEach(function(current) {
+            current.calculatePercentages(data.totals.inc);
+          });
+        },
+
+        getPercentages: function() {
+            var allPercentages = data.allItems.exp.map(function(current) {
+                return current.getPercentage();
+            });
+            return allPercentages;
         },
 
         calculateBudget: function() {
@@ -238,19 +262,21 @@ var Controller = (function(budgetCtrl,UICtrl) {
 
         // 2. Return the budget
         budget = budgetCtrl.getBudget();
-        console.log(budget);
 
         // 3. Display the budget on the UI
         UICtrl.displayBudget(budget);
     }
 
     var updatePercentages = function() {
+      var percentages;
       // 1. calculate percentages
-
+      budgetCtrl.calculatePercentages();
       // 2. read percentages from the budget controller
-
+      percentages = budgetCtrl.getPercentages();
       // 3. Update the UI with the new percentages
-    },
+      console.log(percentages);
+
+    }
 
     var controlAddItem = function() {
         var input, newItem;
